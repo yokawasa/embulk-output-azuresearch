@@ -23,6 +23,7 @@ module AzureSearch
         document['@search.action'] = action
       end
       req_body =  { :value => documents }.to_json
+      puts req_body
       # p "REQ_BODY= #{req_body}"
       # p "URI= #{@api_url}/indexes/#{index_name}/docs/index?api-version=#{@api_version}"
       res = RestClient.post(
