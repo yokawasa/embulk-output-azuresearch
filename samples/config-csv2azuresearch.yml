@@ -21,8 +21,8 @@ in:
     - {name: link, type: string}
 out:
   type: azuresearch
-  endpoint: https://yoichikademo1.search.windows.net
-  api_key:  9E55964F8254BB4404D53F66A39AF5EB
+  endpoint: https://yoichikademo.search.windows.net
+  api_key:  9E55964F8254BBXX04D53F66A39AF5EB
   search_index: sampleindex01
   column_names: id,title,speakers,text,url
   key_names: id,title,speakers,description,link
