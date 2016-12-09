@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <link href='https://fonts.googleapis.com/css?family=Chivo:900' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-dark.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <title>embulk-output-azuresearch by yokawasa</title>
+  </head>
+
+  <body>
+    <div id="container">
+      <div class="inner">
+
+        <header>
+          <h1>embulk-output-azuresearch</h1>
+          <h2>Azure Search output plugin for Embulk</h2>
+        </header>
+
+        <section id="downloads" class="clearfix">
+          <a href="https://github.com/yokawasa/embulk-output-azuresearch/zipball/master" id="download-zip" class="button"><span>Download .zip</span></a>
+          <a href="https://github.com/yokawasa/embulk-output-azuresearch/tarball/master" id="download-tar-gz" class="button"><span>Download .tar.gz</span></a>
+          <a href="https://github.com/yokawasa/embulk-output-azuresearch" id="view-on-github" class="button"><span>View on GitHub</span></a>
+        </section>
+
+        <hr>
+
+        <section id="main_content">
+          <h1>
+<a id="azure-search-output-plugin-for-embulk" class="anchor" href="#azure-search-output-plugin-for-embulk" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Azure Search output plugin for Embulk</h1>
+
+<p>embulk-output-azuresearch is an embulk output plugin that dumps records to Azure Search. Embulk is a open-source bulk data loader that helps data transfer between various databases, storages, file formats, and cloud services. See <a href="http://www.embulk.org/docs/">Embulk documentation</a> for details.</p>
+
+<h2>
+<a id="overview" class="anchor" href="#overview" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Overview</h2>
+
+<ul>
+<li>
+<strong>Plugin type</strong>: output</li>
+<li>
+<strong>Load all or nothing</strong>: no</li>
+<li>
+<strong>Resume supported</strong>: no</li>
+<li>
+<strong>Cleanup supported</strong>: yes</li>
+</ul>
+
+<h2>
+<a id="installation" class="anchor" href="#installation" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Installation</h2>
+
+<pre><code>$ gem install fluent-plugin-azuresearch
+</code></pre>
+
+<h2>
+<a id="configuration" class="anchor" href="#configuration" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Configuration</h2>
+
+<h3>
+<a id="azure-search" class="anchor" href="#azure-search" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Azure Search</h3>
+
+<p>To use Microsoft Azure Search, you must create an Azure Search service in the Azure Portal. Also you must have an index, persisted storage of documents to which embulk-output-azuresearch writes event stream out. Here are instructions:</p>
+
+<ul>
+<li><a href="https://azure.microsoft.com/en-us/documentation/articles/search-create-service-portal/">Create a service</a></li>
+<li><a href="https://azure.microsoft.com/en-us/documentation/articles/search-what-is-an-index/">Create an index</a></li>
+</ul>
+
+<p>Sample Index Schema: sampleindex01</p>
+
+<div class="highlight highlight-source-json"><pre>{
+    <span class="pl-s"><span class="pl-pds">"</span>name<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>sampleindex01<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>fields<span class="pl-pds">"</span></span>: [
+        { <span class="pl-s"><span class="pl-pds">"</span>name<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>id<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>type<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Edm.String<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>key<span class="pl-pds">"</span></span>: <span class="pl-c1">true</span>, <span class="pl-s"><span class="pl-pds">"</span>searchable<span class="pl-pds">"</span></span>: <span class="pl-c1">false</span> },
+        { <span class="pl-s"><span class="pl-pds">"</span>name<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>type<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Edm.String<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>analyzer<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>en.microsoft<span class="pl-pds">"</span></span> },
+        { <span class="pl-s"><span class="pl-pds">"</span>name<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>speakers<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>type<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Edm.String<span class="pl-pds">"</span></span> },
+        { <span class="pl-s"><span class="pl-pds">"</span>name<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>url<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>type<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Edm.String<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>searchable<span class="pl-pds">"</span></span>: <span class="pl-c1">false</span>, <span class="pl-s"><span class="pl-pds">"</span>filterable<span class="pl-pds">"</span></span>:<span class="pl-c1">false</span>, <span class="pl-s"><span class="pl-pds">"</span>sortable<span class="pl-pds">"</span></span>:<span class="pl-c1">false</span>, <span class="pl-s"><span class="pl-pds">"</span>facetable<span class="pl-pds">"</span></span>:<span class="pl-c1">false</span> },
+        { <span class="pl-s"><span class="pl-pds">"</span>name<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>text<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>type<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Edm.String<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>filterable<span class="pl-pds">"</span></span>:<span class="pl-c1">false</span>, <span class="pl-s"><span class="pl-pds">"</span>sortable<span class="pl-pds">"</span></span>:<span class="pl-c1">false</span>, <span class="pl-s"><span class="pl-pds">"</span>facetable<span class="pl-pds">"</span></span>:<span class="pl-c1">false</span>, <span class="pl-s"><span class="pl-pds">"</span>analyzer<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>en.microsoft<span class="pl-pds">"</span></span> }
+    ]
+}</pre></div>
+
+<h3>
+<a id="embulk-configuration-configyml" class="anchor" href="#embulk-configuration-configyml" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Embulk Configuration (config.yml)</h3>
+
+<div class="highlight highlight-source-yaml"><pre><span class="pl-ent">out:</span>
+  <span class="pl-ent">type:</span> <span class="pl-s">azuresearch</span>
+  <span class="pl-ent">endpoint:</span> <span class="pl-s">https://yoichikademo.search.windows.net</span>
+  <span class="pl-ent">api_key:</span>  <span class="pl-s">9E55964F8254BB4504DX3F66A39AF5EB</span>
+  <span class="pl-ent">search_index:</span> <span class="pl-s">sampleindex01</span>
+  <span class="pl-ent">column_names:</span> <span class="pl-s">id,title,speakers,text,url</span>
+  <span class="pl-ent">key_names:</span> <span class="pl-s">id,title,speakers,description,link</span></pre></div>
+
+<ul>
+<li>
+<strong>endpoint (required)</strong> - Azure Search service endpoint URI</li>
+<li>
+<strong>api_key (required)</strong> - Azure Search API key</li>
+<li>
+<strong>search_index (required)</strong> - Azure Search Index name to insert records</li>
+<li>
+<strong>column_names (required)</strong> - Column names in a target Azure search index. Each column needs to be separated by a comma.</li>
+<li>
+<strong>key_names (optional)</strong> - Default:nil. Key names in incomming record to insert. Each key needs to be separated by a comma. By default, <strong>key_names</strong> is as same as <strong>column_names</strong>
+</li>
+</ul>
+
+<h2>
+<a id="sample-configurations" class="anchor" href="#sample-configurations" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Sample Configurations</h2>
+
+<h3>
+<a id="1-case-column_names-and-key_names-are-same" class="anchor" href="#1-case-column_names-and-key_names-are-same" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>(1) Case: column_names and key_names are same</h3>
+
+<p>Suppose you have the following config.yml and sample azure search index schema written above:</p>
+
+<p>config.yml</p>
+
+<div class="highlight highlight-source-yaml"><pre><span class="pl-ent">in:</span>
+  <span class="pl-ent">type:</span> <span class="pl-s">file</span>
+  <span class="pl-ent">path_prefix:</span> <span class="pl-s">samples/sample_01.csv</span>
+  <span class="pl-ent">parser:</span>
+    <span class="pl-ent">charset:</span> <span class="pl-s">UTF-8</span>
+    <span class="pl-ent">newline:</span> <span class="pl-s">CRLF</span>
+    <span class="pl-ent">type:</span> <span class="pl-s">csv</span>
+    <span class="pl-ent">delimiter:</span> <span class="pl-s"><span class="pl-pds">'</span>,<span class="pl-pds">'</span></span>
+    <span class="pl-ent">quote:</span> <span class="pl-s"><span class="pl-pds">'</span>"<span class="pl-pds">'</span></span>
+    <span class="pl-ent">escape:</span> <span class="pl-s"><span class="pl-pds">'</span>"<span class="pl-pds">'</span></span>
+    <span class="pl-ent">null_string:</span> <span class="pl-s"><span class="pl-pds">'</span>NULL<span class="pl-pds">'</span></span>
+    <span class="pl-ent">trim_if_not_quoted:</span> <span class="pl-c1">false</span>
+    <span class="pl-ent">skip_header_lines:</span> <span class="pl-c1">1</span>
+    <span class="pl-ent">allow_extra_columns:</span> <span class="pl-c1">false</span>
+    <span class="pl-ent">allow_optional_columns:</span> <span class="pl-c1">false</span>
+    <span class="pl-ent">columns:</span>
+    - <span class="pl-ent">{name:</span> <span class="pl-s">id, type: string}</span>
+    - <span class="pl-ent">{name:</span> <span class="pl-s">title, type: string}</span>
+    - <span class="pl-ent">{name:</span> <span class="pl-s">speakers, type: string}</span>
+    - <span class="pl-ent">{name:</span> <span class="pl-s">text, type: string}</span>
+    - <span class="pl-ent">{name:</span> <span class="pl-s">url, type: string}</span>
+<span class="pl-ent">out:</span>
+  <span class="pl-ent">type:</span> <span class="pl-s">azuresearch</span>
+  <span class="pl-ent">endpoint:</span> <span class="pl-s">https://yoichikademo.search.windows.net</span>
+  <span class="pl-ent">api_key:</span>  <span class="pl-s">9E55964F8254BBXX04D53F66A39AF5EB</span>
+  <span class="pl-ent">search_index:</span> <span class="pl-s">sampleindex01</span>
+  <span class="pl-ent">column_names:</span> <span class="pl-s">id,title,speakers,text,url</span></pre></div>
+
+<p>The plugin will dump records out to Azure Ssearch like this:</p>
+
+<p>Input CSV</p>
+
+<pre lang="csv"><code>id,title,speakers,text,url
+1,Moving to the Cloud,Narayan Annamalai,Benefits of moving your applications to cloud,https://s.ch9.ms/Events/Build/2016/P576
+2,Building Big Data Applications using Spark and Hadoop,Maxim Lukiyanov,How to leverage Spark to build intelligence into your application,https://s.ch9.ms/Events/Build/2016/P420
+3,Service Fabric Deploying and Managing Applications with Service Fabric,Chacko Daniel,Service Fabric deploys and manages distributed applications built as microservices,https://s.ch9.ms/Events/Build/2016/P431
+</code></pre>
+
+<p>Output JSON Body to Azure Search</p>
+
+<div class="highlight highlight-source-json"><pre>{<span class="pl-s"><span class="pl-pds">"</span>value<span class="pl-pds">"</span></span>:
+    [
+        {<span class="pl-s"><span class="pl-pds">"</span>id<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>1<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Moving to the Cloud<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>speakers<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Narayan Annamalai<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>text<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Benefits of moving your applications to cloud<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>url<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>https://s.ch9.ms/Events/Build/2016/P576<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>@search.action<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>mergeOrUpload<span class="pl-pds">"</span></span>},
+        {<span class="pl-s"><span class="pl-pds">"</span>id<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>2<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Building Big Data Applications using Spark and Hadoop<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>speakers<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Maxim Lukiyanov<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>text<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>How to leverage Spark to build intelligence into your application<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>url<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>https://s.ch9.ms/Events/Build/2016/P420<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>@search.action<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>mergeOrUpload<span class="pl-pds">"</span></span>},
+        {<span class="pl-s"><span class="pl-pds">"</span>id<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>3<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Service Fabric Deploying and Managing Applications with Service Fabric<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>speakers<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Chacko Daniel<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>text<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Service Fabric deploys and manages distributed applications built as microservices<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>url<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>https://s.ch9.ms/Events/Build/2016/P431<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>@search.action<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>mergeOrUpload<span class="pl-pds">"</span></span>}
+    ]
+}</pre></div>
+
+<h3>
+<a id="2-case-column_names-and-key_names-are-not-same" class="anchor" href="#2-case-column_names-and-key_names-are-not-same" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>(2) Case: column_names and key_names are NOT same</h3>
+
+<p>Suppose you have the following config.yml and sample azure search index schema written above:</p>
+
+<p>config.yml</p>
+
+<div class="highlight highlight-source-yaml"><pre><span class="pl-ent">in:</span>
+  <span class="pl-ent">type:</span> <span class="pl-s">file</span>
+  <span class="pl-ent">path_prefix:</span> <span class="pl-s">samples/sample_01.csv</span>
+  <span class="pl-ent">parser:</span>
+    <span class="pl-ent">charset:</span> <span class="pl-s">UTF-8</span>
+    <span class="pl-ent">newline:</span> <span class="pl-s">CRLF</span>
+    <span class="pl-ent">type:</span> <span class="pl-s">csv</span>
+    <span class="pl-ent">delimiter:</span> <span class="pl-s"><span class="pl-pds">'</span>,<span class="pl-pds">'</span></span>
+    <span class="pl-ent">quote:</span> <span class="pl-s"><span class="pl-pds">'</span>"<span class="pl-pds">'</span></span>
+    <span class="pl-ent">escape:</span> <span class="pl-s"><span class="pl-pds">'</span>"<span class="pl-pds">'</span></span>
+    <span class="pl-ent">null_string:</span> <span class="pl-s"><span class="pl-pds">'</span>NULL<span class="pl-pds">'</span></span>
+    <span class="pl-ent">trim_if_not_quoted:</span> <span class="pl-c1">false</span>
+    <span class="pl-ent">skip_header_lines:</span> <span class="pl-c1">1</span>
+    <span class="pl-ent">allow_extra_columns:</span> <span class="pl-c1">false</span>
+    <span class="pl-ent">allow_optional_columns:</span> <span class="pl-c1">false</span>
+    <span class="pl-ent">columns:</span>
+    - <span class="pl-ent">{name:</span> <span class="pl-s">id, type: string}</span>
+    - <span class="pl-ent">{name:</span> <span class="pl-s">title, type: string}</span>
+    - <span class="pl-ent">{name:</span> <span class="pl-s">speakers, type: string}</span>
+    - <span class="pl-ent">{name:</span> <span class="pl-s">description, type: string}</span>
+    - <span class="pl-ent">{name:</span> <span class="pl-s">link, type: string}</span>
+<span class="pl-ent">out:</span>
+  <span class="pl-ent">type:</span> <span class="pl-s">azuresearch</span>
+  <span class="pl-ent">endpoint:</span> <span class="pl-s">https://yoichikademo.search.windows.net</span>
+  <span class="pl-ent">api_key:</span>  <span class="pl-s">9E55964F8254BBXX04D53F66A39AF5EB</span>
+  <span class="pl-ent">search_index:</span> <span class="pl-s">sampleindex01</span>
+  <span class="pl-ent">column_names:</span> <span class="pl-s">id,title,speakers,description,link</span>
+  <span class="pl-ent">key_names:</span> <span class="pl-s">id,title,speakers,text,url</span></pre></div>
+
+<p>The plugin will dump records out to Azure Ssearch like this:</p>
+
+<p>Input CSV</p>
+
+<pre lang="csv"><code>id,title,speakers,description,link
+1,Moving to the Cloud,Narayan Annamalai,Benefits of moving your applications to cloud,https://s.ch9.ms/Events/Build/2016/P576
+2,Building Big Data Applications using Spark and Hadoop,Maxim Lukiyanov,How to leverage Spark to build intelligence into your application,https://s.ch9.ms/Events/Build/2016/P420
+3,Service Fabric Deploying and Managing Applications with Service Fabric,Chacko Daniel,Service Fabric deploys and manages distributed applications built as microservices,https://s.ch9.ms/Events/Build/2016/P431
+</code></pre>
+
+<p>Output JSON Body to Azure Search</p>
+
+<div class="highlight highlight-source-json"><pre>{<span class="pl-s"><span class="pl-pds">"</span>value<span class="pl-pds">"</span></span>:
+    [
+        {<span class="pl-s"><span class="pl-pds">"</span>id<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>1<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Moving to the Cloud<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>speakers<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Narayan Annamalai<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>text<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Benefits of moving your applications to cloud<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>url<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>https://s.ch9.ms/Events/Build/2016/P576<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>@search.action<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>mergeOrUpload<span class="pl-pds">"</span></span>},
+        {<span class="pl-s"><span class="pl-pds">"</span>id<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>2<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Building Big Data Applications using Spark and Hadoop<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>speakers<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Maxim Lukiyanov<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>text<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>How to leverage Spark to build intelligence into your application<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>url<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>https://s.ch9.ms/Events/Build/2016/P420<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>@search.action<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>mergeOrUpload<span class="pl-pds">"</span></span>},
+        {<span class="pl-s"><span class="pl-pds">"</span>id<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>3<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>title<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Service Fabric Deploying and Managing Applications with Service Fabric<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>speakers<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Chacko Daniel<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>text<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>Service Fabric deploys and manages distributed applications built as microservices<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>url<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>https://s.ch9.ms/Events/Build/2016/P431<span class="pl-pds">"</span></span>,<span class="pl-s"><span class="pl-pds">"</span>@search.action<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>mergeOrUpload<span class="pl-pds">"</span></span>}
+    ]
+}</pre></div>
+
+<h2>
+<a id="build-install-and-run" class="anchor" href="#build-install-and-run" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Build, Install, and Run</h2>
+
+<pre><code>$ rake
+
+$ embulk gem install pkg/embulk-output-azuresearch-0.1.0.gem
+
+$ embulk preview config.yml
+
+$ embulk run config.yml
+
+</code></pre>
+
+<h2>
+<a id="change-log" class="anchor" href="#change-log" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Change log</h2>
+
+<ul>
+<li><a href="ChangeLog.md">Changelog</a></li>
+</ul>
+
+<h2>
+<a id="links" class="anchor" href="#links" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Links</h2>
+
+<ul>
+<li><a href="http://yokawasa.github.io/embulk-output-azuresearch">http://yokawasa.github.io/embulk-output-azuresearch</a></li>
+<li><a href="https://rubygems.org/gems/embulk-output-azuresearch/">https://rubygems.org/gems/embulk-output-azuresearch/</a></li>
+<li><a href="http://unofficialism.info/posts/embulk-plugins-for-microsoft-azure-services/">http://unofficialism.info/posts/embulk-plugins-for-microsoft-azure-services/</a></li>
+</ul>
+
+<h2>
+<a id="contributing" class="anchor" href="#contributing" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Contributing</h2>
+
+<p>Bug reports and pull requests are welcome on GitHub at <a href="https://github.com/yokawasa/embulk-output-azuresearch">https://github.com/yokawasa/embulk-output-azuresearch</a>.</p>
+
+<h2>
+<a id="copyright" class="anchor" href="#copyright" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Copyright</h2>
+
+<table>
+  <tr>
+    <td>Copyright</td>
+<td>Copyright (c) 2016- Yoichi Kawasaki</td>
+  </tr>
+  <tr>
+    <td>License</td>
+<td>MIT</td>
+  </tr>
+</table>
+        </section>
+
+        <footer>
+          embulk-output-azuresearch is maintained by <a href="https://github.com/yokawasa">yokawasa</a><br>
+          This page was generated by <a href="https://pages.github.com">GitHub Pages</a>. Tactile theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.
+        </footer>
+
+        
+      </div>
+    </div>
+  </body>
+</html>
