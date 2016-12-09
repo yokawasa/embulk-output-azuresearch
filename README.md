@@ -194,6 +194,15 @@ $ embulk run config.yml
 
 ```
 
+## Change log
+* [Changelog](ChangeLog.md)
+
+## Links
+
+* http://yokawasa.github.io/embulk-output-azuresearch
+* https://rubygems.org/gems/embulk-output-azuresearch/
+* http://unofficialism.info/posts/embulk-plugins-for-microsoft-azure-services/
+
 ## Contributing
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/yokawasa/embulk-output-azuresearch.
